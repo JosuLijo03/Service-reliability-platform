@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Reliability Hub</title>
+
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+  <!-- =========================
+         HEADER
+         ========================= -->
+
+  <header>
+
+    <h1>⚡ RELIABILITY HUB</h1>
+
+    <p>
+      Service Reliability & Incident Monitoring
+    </p>
+
+  </header>
+
+
+  <!-- =========================
+         MAIN DASHBOARD
+         ========================= -->
+
+  <main>
+
+
+    <!-- =========================
+             SUMMARY CARDS
+             ========================= -->
+
+    <section class="summary">
+
+      <div class="card">
+
+        <h3>Total Services</h3>
+
+        <p id="total-services">
+          0
+        </p>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>Services UP</h3>
+
+        <p id="services-up">
+          0
+        </p>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>Services DOWN</h3>
+
+        <p id="services-down">
+          0
+        </p>
+
+      </div>
+
+
+      <div class="card">
+
+        <h3>Open Incidents</h3>
+
+        <p id="open-incidents">
+          0
+        </p>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =========================
+         SERVICE HEALTH
+         ========================= -->
+
+    <section class="panel">
+
+      <h2>Service Health</h2>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Service</th>
+            <th>URL</th>
+            <th>Status</th>
+            <th>Latency</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="services-table">
+
+          <!-- JavaScript will insert services here -->
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+
+    <!-- =========================
+         RECENT ALERTS
+         ========================= -->
+
+    <section class="panel">
+
+      <h2>Recent Alerts</h2>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Type</th>
+            <th>Service ID</th>
+            <th>Message</th>
+            <th>Created</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="alerts-table">
+
+          <!-- JavaScript will insert alerts here -->
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+
+    <!-- =========================
+             INCIDENTS
+             ========================= -->
+
+    <section class="panel">
+
+      <h2>Recent Incidents</h2>
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Service ID
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Started
+            </th>
+
+            <th>
+              Resolved
+            </th>
+
+            <th>
+              Duration
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="incidents-table">
+
+          <!-- JavaScript will insert incidents here -->
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =========================
+         JAVASCRIPT
+         ========================= -->
+
+  <script src="/static/app.js"></script>
+
+</body>
+
+</html>
