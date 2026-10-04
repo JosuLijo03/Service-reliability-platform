@@ -2,10 +2,6 @@
 // Load dashboard data
 // ================================
 
-// ================================
-// Load dashboard data
-// ================================
-
 async function loadDashboard() {
   try {
     const servicesResponse = await fetch("/services");
@@ -26,6 +22,237 @@ async function loadDashboard() {
     console.error("Failed to load dashboard:", error);
   }
 }
+
+
+// ================================
+// Add service
+// ================================
+
+const addServiceForm =
+  document.getElementById("add-service-form");
+
+if (addServiceForm) {
+
+  addServiceForm.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const name =
+      document.getElementById("service-name").value.trim();
+
+    const url =
+      document.getElementById("service-url").value.trim();
+
+    const checkInterval =
+      Number(
+        document.getElementById("check-interval").value
+      );
+
+    const message =
+      document.getElementById("add-service-message");
+
+    try {
+
+      const response = await fetch("/services", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          name: name,
+          url: url,
+          check_interval: checkInterval
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+
+        message.textContent =
+          result.detail || "Failed to add service.";
+
+        return;
+      }
+
+      message.textContent =
+        `Service "${result.name}" added successfully.`;
+
+      addServiceForm.reset();
+
+      document.getElementById("check-interval").value = 30;
+
+      await loadDashboard();
+
+    } catch (error) {
+
+      console.error("Failed to add service:", error);
+
+      message.textContent =
+        "Failed to connect to the server.";
+    }
+
+  });
+}
+
+
+// ================================
+// Clear data warning modal
+// ================================
+
+const clearDataButton =
+  document.getElementById("clear-data-button");
+
+const warningModal =
+  document.getElementById("warning-modal");
+
+const warningCancel =
+  document.getElementById("warning-cancel");
+
+const warningConfirm =
+  document.getElementById("warning-confirm");
+
+
+// Open warning modal
+
+if (clearDataButton) {
+
+  clearDataButton.addEventListener(
+    "click",
+    function () {
+
+      warningModal.classList.add("show");
+
+    }
+  );
+}
+
+
+// Cancel
+
+if (warningCancel) {
+
+  warningCancel.addEventListener(
+    "click",
+    function () {
+
+      warningModal.classList.remove("show");
+
+    }
+  );
+}
+
+
+// Confirm clear
+
+if (warningConfirm) {
+
+  warningConfirm.addEventListener(
+    "click",
+    async function () {
+
+      try {
+
+        warningConfirm.disabled = true;
+
+        warningConfirm.textContent =
+          "Clearing...";
+
+        const response =
+          await fetch("/data", {
+            method: "DELETE"
+          });
+
+        const result =
+          await response.json();
+
+        if (!response.ok) {
+
+          alert(
+            result.detail ||
+            "Failed to clear monitoring data."
+          );
+
+          return;
+        }
+
+        warningModal.classList.remove("show");
+
+        await loadDashboard();
+
+        const message =
+          document.getElementById(
+            "add-service-message"
+          );
+
+        if (message) {
+          message.textContent =
+            "All monitoring data has been cleared.";
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Failed to clear monitoring data:",
+          error
+        );
+
+        alert(
+          "Failed to connect to the server."
+        );
+
+      } finally {
+
+        warningConfirm.disabled = false;
+
+        warningConfirm.textContent =
+          "Clear All Data";
+      }
+
+    }
+  );
+}
+
+
+// Close modal when clicking outside the box
+
+if (warningModal) {
+
+  warningModal.addEventListener(
+    "click",
+    function (event) {
+
+      if (event.target === warningModal) {
+
+        warningModal.classList.remove("show");
+
+      }
+
+    }
+  );
+}
+
+
+// Close modal with Escape key
+
+document.addEventListener(
+  "keydown",
+  function (event) {
+
+    if (
+      event.key === "Escape" &&
+      warningModal &&
+      warningModal.classList.contains("show")
+    ) {
+
+      warningModal.classList.remove("show");
+
+    }
+
+  }
+);
 
 
 // ================================
@@ -54,14 +281,22 @@ function updateSummary(services, incidents) {
 
 async function updateServices(services) {
 
-  const table = document.getElementById("services-table");
+  const table =
+    document.getElementById("services-table");
 
   table.innerHTML = "";
+
+  // Show only the 6 most recently added services
+
+  const recentServices =
+    [...services]
+      .sort((a, b) => b.id - a.id)
+      .slice(0, 6);
 
   let servicesUp = 0;
   let servicesDown = 0;
 
-  for (const service of services) {
+  for (const service of recentServices) {
 
     try {
 
@@ -71,7 +306,8 @@ async function updateServices(services) {
 
       const result = await response.json();
 
-      const row = document.createElement("tr");
+      const row =
+        document.createElement("tr");
 
       let statusClass;
       let statusText;
@@ -90,18 +326,18 @@ async function updateServices(services) {
       }
 
       row.innerHTML = `
-                <td>${service.name}</td>
+        <td>${service.name}</td>
 
-                <td>${service.url}</td>
+        <td>${service.url}</td>
 
-                <td class="${statusClass}">
-                    ${statusText}
-                </td>
+        <td class="${statusClass}">
+          ${statusText}
+        </td>
 
-                <td>
-                    ${result.response_time} ms
-                </td>
-            `;
+        <td>
+          ${result.response_time ?? "--"} ms
+        </td>
+      `;
 
       table.appendChild(row);
 
@@ -109,19 +345,20 @@ async function updateServices(services) {
 
       servicesDown++;
 
-      const row = document.createElement("tr");
+      const row =
+        document.createElement("tr");
 
       row.innerHTML = `
-                <td>${service.name}</td>
+        <td>${service.name}</td>
 
-                <td>${service.url}</td>
+        <td>${service.url}</td>
 
-                <td class="status-down">
-                    ● DOWN
-                </td>
+        <td class="status-down">
+          ● DOWN
+        </td>
 
-                <td>--</td>
-            `;
+        <td>--</td>
+      `;
 
       table.appendChild(row);
     }
@@ -141,28 +378,49 @@ async function updateServices(services) {
 
 function updateIncidents(incidents) {
 
-  const table = document.getElementById("incidents-table");
+  const table =
+    document.getElementById("incidents-table");
 
   table.innerHTML = "";
 
-  for (const incident of incidents) {
+  // Show only the 4 most recent incidents
 
-    const row = document.createElement("tr");
+  const recentIncidents =
+    [...incidents]
+      .sort(
+        (a, b) =>
+          new Date(b.started_at) -
+          new Date(a.started_at)
+      )
+      .slice(0, 4);
+
+  for (const incident of recentIncidents) {
+
+    const row =
+      document.createElement("tr");
 
     const started =
-      new Date(incident.started_at).toLocaleString();
+      new Date(
+        incident.started_at
+      ).toLocaleString();
 
     const resolved =
       incident.resolved_at
-        ? new Date(incident.resolved_at).toLocaleString()
+        ? new Date(
+            incident.resolved_at
+          ).toLocaleString()
         : "--";
 
     let duration = "--";
 
-    if (incident.duration_seconds !== null) {
+    if (
+      incident.duration_seconds !== null
+    ) {
 
       const seconds =
-        Math.round(incident.duration_seconds);
+        Math.round(
+          incident.duration_seconds
+        );
 
       const minutes =
         Math.floor(seconds / 60);
@@ -180,18 +438,18 @@ function updateIncidents(incidents) {
         : "status-resolved";
 
     row.innerHTML = `
-            <td>${incident.service_id}</td>
+      <td>${incident.service_id}</td>
 
-            <td class="${statusClass}">
-                ${incident.status}
-            </td>
+      <td class="${statusClass}">
+        ${incident.status}
+      </td>
 
-            <td>${started}</td>
+      <td>${started}</td>
 
-            <td>${resolved}</td>
+      <td>${resolved}</td>
 
-            <td>${duration}</td>
-        `;
+      <td>${duration}</td>
+    `;
 
     table.appendChild(row);
   }
@@ -204,16 +462,31 @@ function updateIncidents(incidents) {
 
 function updateAlerts(alerts) {
 
-  const table = document.getElementById("alerts-table");
+  const table =
+    document.getElementById("alerts-table");
 
   table.innerHTML = "";
 
-  for (const alert of alerts) {
+  // Show only the 6 most recent alerts
 
-    const row = document.createElement("tr");
+  const recentAlerts =
+    [...alerts]
+      .sort(
+        (a, b) =>
+          new Date(b.created_at) -
+          new Date(a.created_at)
+      )
+      .slice(0, 6);
+
+  for (const alert of recentAlerts) {
+
+    const row =
+      document.createElement("tr");
 
     const created =
-      new Date(alert.created_at).toLocaleString();
+      new Date(
+        alert.created_at
+      ).toLocaleString();
 
     const typeClass =
       alert.type === "DOWN"
@@ -221,13 +494,16 @@ function updateAlerts(alerts) {
         : "status-resolved";
 
     row.innerHTML = `
-            <td class="${typeClass}">
-                ${alert.type}
-            </td>
-            <td>${alert.service_id}</td>
-            <td>${alert.message}</td>
-            <td>${created}</td>
-        `;
+      <td class="${typeClass}">
+        ${alert.type}
+      </td>
+
+      <td>${alert.service_id}</td>
+
+      <td>${alert.message}</td>
+
+      <td>${created}</td>
+    `;
 
     table.appendChild(row);
   }
@@ -239,4 +515,8 @@ function updateAlerts(alerts) {
 // ================================
 
 loadDashboard();
-setInterval(loadDashboard, 30000);
+
+setInterval(
+  loadDashboard,
+  30000
+);

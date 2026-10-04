@@ -18,11 +18,24 @@
 
   <header>
 
-    <h1>⚡ RELIABILITY HUB</h1>
+    <div class="header-content">
 
-    <p>
-      Service Reliability & Incident Monitoring
-    </p>
+      <div>
+
+        <h1>⚡ RELIABILITY HUB</h1>
+
+        <p>
+          Service Reliability & Incident Monitoring
+        </p>
+
+      </div>
+
+
+      <button id="clear-data-button" class="clear-data-button" title="Clear all monitoring data">
+        🗑️
+      </button>
+
+    </div>
 
   </header>
 
@@ -82,6 +95,61 @@
         </p>
 
       </div>
+
+    </section>
+
+
+    <!-- =========================
+         ADD SERVICE
+         ========================= -->
+
+    <section class="panel">
+
+      <h2>Add Service</h2>
+
+      <form id="add-service-form">
+
+        <div>
+
+          <label for="service-name">
+            Service Name
+          </label>
+
+          <input type="text" id="service-name" placeholder="e.g. Google" required>
+
+        </div>
+
+
+        <div>
+
+          <label for="service-url">
+            Service URL
+          </label>
+
+          <input type="url" id="service-url" placeholder="https://example.com" required>
+
+        </div>
+
+
+        <div>
+
+          <label for="check-interval">
+            Check Interval (seconds)
+          </label>
+
+          <input type="number" id="check-interval" value="30" min="5" required>
+
+        </div>
+
+
+        <button type="submit">
+          Add Service
+        </button>
+
+      </form>
+
+
+      <p id="add-service-message"></p>
 
     </section>
 
@@ -203,7 +271,42 @@
 
   </main>
 
+  <!-- ================================
+     Clear Data Warning Modal
+================================ -->
 
+  <div id="warning-modal" class="warning-modal">
+
+    <div class="warning-box">
+
+      <div class="warning-icon">
+        <span>!</span>
+      </div>
+
+      <h2>Clear All Monitoring Data?</h2>
+
+      <p>
+        This will permanently delete
+        <strong>all services, monitoring history,
+          incidents, and alerts</strong>.
+        This action cannot be undone.
+      </p>
+
+      <div class="warning-actions">
+
+        <button id="warning-cancel" class="warning-cancel">
+          Cancel
+        </button>
+
+        <button id="warning-confirm" class="warning-confirm">
+          Clear All Data
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
   <!-- =========================
          JAVASCRIPT
          ========================= -->

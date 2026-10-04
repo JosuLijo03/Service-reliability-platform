@@ -30,6 +30,8 @@ body {
 
     background-attachment: fixed;
 }
+
+
 /* =========================
    HEADER
    ========================= */
@@ -38,6 +40,15 @@ header {
     padding: 28px 45px;
     border-bottom: 1px solid #26344d;
     background: #111a2b;
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 header h1 {
@@ -51,6 +62,46 @@ header p {
     font-size: 14px;
 }
 
+
+/* =========================
+   BIN BUTTON
+   ========================= */
+
+.clear-data-button {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #3b4b66;
+    border-radius: 9px;
+
+    background: #0b1220;
+    color: #f8fafc;
+
+    font-size: 17px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.clear-data-button:hover {
+    background: #3b1720;
+    border-color: #ef4444;
+    transform: translateY(-1px);
+}
+
+.clear-data-button:active {
+    transform: translateY(0);
+}
+
+
 /* =========================
    MAIN CONTENT
    ========================= */
@@ -60,6 +111,7 @@ main {
     max-width: 1400px;
     margin: auto;
 }
+
 
 /* =========================
    SUMMARY CARDS
@@ -99,6 +151,7 @@ main {
     font-weight: bold;
 }
 
+
 /* =========================
    PANELS
    ========================= */
@@ -116,6 +169,128 @@ main {
     margin-bottom: 20px;
     font-size: 19px;
 }
+
+
+/* =========================
+   ADD SERVICE
+   ========================= */
+
+#add-service-form {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 0.8fr auto;
+    gap: 16px;
+    align-items: end;
+}
+
+#add-service-form > div {
+    display: flex;
+    flex-direction: column;
+}
+
+#add-service-form label {
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+#add-service-form input {
+    width: 100%;
+    height: 42px;
+
+    padding: 10px 12px;
+
+    background: #0b1220;
+    color: #f8fafc;
+
+    border: 1px solid #34445f;
+    border-radius: 8px;
+
+    outline: none;
+
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+#add-service-form input::placeholder {
+    color: #64748b;
+}
+
+#add-service-form input:hover {
+    border-color: #4b5d7a;
+}
+
+#add-service-form input:focus {
+    background: #0d1728;
+
+    border-color: #f5c542;
+
+    box-shadow:
+        0 0 0 2px rgba(245, 197, 66, 0.12);
+}
+
+
+/* Number input */
+
+#add-service-form input[type="number"] {
+    appearance: textfield;
+}
+
+#add-service-form input[type="number"]::-webkit-inner-spin-button,
+#add-service-form input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+}
+
+
+/* Add service button */
+
+#add-service-form button {
+    height: 42px;
+
+    padding: 0 20px;
+
+    background: #f5c542;
+    color: #07111f;
+
+    border: 1px solid #f5c542;
+    border-radius: 8px;
+
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#add-service-form button:hover {
+    background: #ffd45c;
+
+    box-shadow:
+        0 4px 14px rgba(245, 197, 66, 0.18);
+
+    transform: translateY(-1px);
+}
+
+#add-service-form button:active {
+    transform: translateY(0);
+}
+
+#add-service-message {
+    margin-top: 14px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
 
 /* =========================
    TABLE
@@ -154,6 +329,7 @@ tbody tr:hover {
     background: #172238;
 }
 
+
 /* =========================
    STATUS
    ========================= */
@@ -178,9 +354,219 @@ tbody tr:hover {
     font-weight: bold;
 }
 
+
+/* =========================
+   WARNING MODAL
+   ========================= */
+
+.warning-modal {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(2, 8, 23, 0.82);
+
+    z-index: 1000;
+}
+
+.warning-modal.show {
+    display: flex;
+}
+
+
+/* =========================
+   WARNING DIALOG
+   ========================= */
+
+.warning-box {
+    width: 100%;
+    max-width: 460px;
+
+    background: #0b1729;
+
+    border: 2px solid #f5c542;
+    border-radius: 14px;
+
+    padding: 30px;
+
+    position: relative;
+
+    box-shadow:
+        0 0 0 1px rgba(245, 197, 66, 0.12),
+        0 20px 70px rgba(0, 0, 0, 0.65);
+}
+
+
+/* Golden top accent */
+
+.warning-box::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 4px;
+
+    background: #f5c542;
+
+    border-radius: 14px 14px 0 0;
+}
+
+
+/* =========================
+   RED WARNING TRIANGLE
+   ========================= */
+
+.warning-icon {
+    width: 0;
+    height: 0;
+
+    border-left: 34px solid transparent;
+    border-right: 34px solid transparent;
+    border-bottom: 60px solid #ef4444;
+
+    margin: 5px auto 22px;
+
+    position: relative;
+}
+
+.warning-icon span {
+    position: absolute;
+
+    left: 50%;
+    top: 20px;
+
+    transform: translateX(-50%);
+
+    color: #ffffff;
+
+    font-size: 25px;
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+
+/* =========================
+   WARNING TEXT
+   ========================= */
+
+.warning-box h2 {
+    color: #ffffff;
+
+    text-align: center;
+
+    font-size: 21px;
+    font-weight: 700;
+
+    margin-bottom: 12px;
+}
+
+.warning-box p {
+    color: #dbe4f0;
+
+    text-align: center;
+
+    font-size: 14px;
+    line-height: 1.7;
+
+    margin-bottom: 26px;
+}
+
+.warning-box strong {
+    color: #ef4444;
+}
+
+
+/* =========================
+   WARNING BUTTONS
+   ========================= */
+
+.warning-actions {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 12px;
+}
+
+.warning-cancel {
+    min-width: 110px;
+
+    padding: 11px 18px;
+
+    background: #111f35;
+    color: #f8fafc;
+
+    border: 1px solid #3b506f;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.warning-cancel:hover {
+    background: #172b47;
+    border-color: #f5c542;
+}
+
+.warning-confirm {
+    min-width: 135px;
+
+    padding: 11px 18px;
+
+    background: #7f1d1d;
+    color: #ffffff;
+
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.warning-confirm:hover {
+    background: #b91c1c;
+    border-color: #f87171;
+}
+
+.warning-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
 /* =========================
    RESPONSIVE
    ========================= */
+
+@media (max-width: 1000px) {
+
+    #add-service-form {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #add-service-form button {
+        width: 100%;
+    }
+}
+
 
 @media (max-width: 900px) {
 
@@ -191,13 +577,21 @@ tbody tr:hover {
     main {
         padding: 25px;
     }
-
 }
+
 
 @media (max-width: 600px) {
 
     header {
         padding: 22px;
+    }
+
+    .header-content {
+        gap: 15px;
+    }
+
+    header h1 {
+        font-size: 22px;
     }
 
     main {
@@ -212,4 +606,24 @@ tbody tr:hover {
         overflow-x: auto;
     }
 
+    #add-service-form {
+        grid-template-columns: 1fr;
+    }
+
+    #add-service-form button {
+        width: 100%;
+    }
+
+    .warning-box {
+        padding: 25px 20px;
+    }
+
+    .warning-actions {
+        flex-direction: column;
+    }
+
+    .warning-cancel,
+    .warning-confirm {
+        width: 100%;
+    }
 }

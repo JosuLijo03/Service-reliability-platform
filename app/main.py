@@ -6,12 +6,14 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
-from .models import Service, MonitoringResult, Incident , Alert
+from .models import Service, MonitoringResult, Incident, Alert
 from .schemas import ServiceCreate, ServiceResponse
 from .monitor import check_service
 from .monitor_loop import monitoring_loop
 
+
 Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title="Service Reliability Platform",
@@ -19,7 +21,12 @@ app = FastAPI(
     version="1.0.0",
 )
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+app.mount(
+    "/static",
+    StaticFiles(directory="app/static"),
+    name="static"
+)
 
 
 @app.on_event("startup")
@@ -46,10 +53,19 @@ def health_check():
     return {"status": "healthy"}
 
 
+# ================================
+# Services
+# ================================
+
 @app.post("/services", response_model=ServiceResponse)
-def create_service(service: ServiceCreate, db: Session = Depends(get_db)):
+def create_service(
+    service: ServiceCreate,
+    db: Session = Depends(get_db)
+):
     new_service = Service(
-        name=service.name, url=service.url, check_interval=service.check_interval
+        name=service.name,
+        url=service.url,
+        check_interval=service.check_interval
     )
 
     db.add(new_service)
@@ -64,9 +80,45 @@ def get_services(db: Session = Depends(get_db)):
     return db.query(Service).all()
 
 
+@app.put("/services/{service_id}")
+def update_service(
+    service_id: int,
+    service: ServiceCreate,
+    db: Session = Depends(get_db)
+):
+    existing_service = (
+        db.query(Service)
+        .filter(Service.id == service_id)
+        .first()
+    )
+
+    if existing_service is None:
+        return {"error": "Service not found"}
+
+    existing_service.name = service.name
+    existing_service.url = service.url
+    existing_service.check_interval = service.check_interval
+
+    db.commit()
+    db.refresh(existing_service)
+
+    return existing_service
+
+
+# ================================
+# Manual service check
+# ================================
+
 @app.get("/check/{service_id}")
-def check(service_id: int, db: Session = Depends(get_db)):
-    service = db.query(Service).filter(Service.id == service_id).first()
+def check(
+    service_id: int,
+    db: Session = Depends(get_db)
+):
+    service = (
+        db.query(Service)
+        .filter(Service.id == service_id)
+        .first()
+    )
 
     if service is None:
         return {"error": "Service not found"}
@@ -95,9 +147,20 @@ def check(service_id: int, db: Session = Depends(get_db)):
     }
 
 
+# ================================
+# Service history
+# ================================
+
 @app.get("/services/{service_id}/history")
-def get_service_history(service_id: int, db: Session = Depends(get_db)):
-    service = db.query(Service).filter(Service.id == service_id).first()
+def get_service_history(
+    service_id: int,
+    db: Session = Depends(get_db)
+):
+    service = (
+        db.query(Service)
+        .filter(Service.id == service_id)
+        .first()
+    )
 
     if service is None:
         return {"error": "Service not found"}
@@ -119,16 +182,23 @@ def get_service_history(service_id: int, db: Session = Depends(get_db)):
                 "response_time": result.response_time,
                 "failure_reason": result.failure_reason,
                 "checked_at": result.checked_at,
-                
             }
             for result in results
         ]
     }
 
 
+# ================================
+# Incidents
+# ================================
+
 @app.get("/incidents")
 def get_incidents(db: Session = Depends(get_db)):
-    incidents = db.query(Incident).all()
+    incidents = (
+        db.query(Incident)
+        .order_by(Incident.started_at.desc())
+        .all()
+    )
 
     return [
         {
@@ -138,7 +208,10 @@ def get_incidents(db: Session = Depends(get_db)):
             "started_at": incident.started_at,
             "resolved_at": incident.resolved_at,
             "duration_seconds": (
-                (incident.resolved_at - incident.started_at).total_seconds()
+                (
+                    incident.resolved_at
+                    - incident.started_at
+                ).total_seconds()
                 if incident.resolved_at
                 else None
             ),
@@ -147,28 +220,20 @@ def get_incidents(db: Session = Depends(get_db)):
     ]
 
 
-@app.put("/services/{service_id}")
-def update_service(
-    service_id: int, service: ServiceCreate, db: Session = Depends(get_db)
-):
-    existing_service = db.query(Service).filter(Service.id == service_id).first()
-
-    if existing_service is None:
-        return {"error": "Service not found"}
-
-    existing_service.name = service.name
-    existing_service.url = service.url
-    existing_service.check_interval = service.check_interval
-
-    db.commit()
-    db.refresh(existing_service)
-
-    return existing_service
-
+# ================================
+# Service uptime
+# ================================
 
 @app.get("/services/{service_id}/uptime")
-def get_service_uptime(service_id: int, db: Session = Depends(get_db)):
-    service = db.query(Service).filter(Service.id == service_id).first()
+def get_service_uptime(
+    service_id: int,
+    db: Session = Depends(get_db)
+):
+    service = (
+        db.query(Service)
+        .filter(Service.id == service_id)
+        .first()
+    )
 
     if service is None:
         return {"error": "Service not found"}
@@ -180,12 +245,19 @@ def get_service_uptime(service_id: int, db: Session = Depends(get_db)):
     )
 
     total_checks = len(results)
-    successful_checks = sum(1 for result in results if result.status == "UP")
+
+    successful_checks = sum(
+        1
+        for result in results
+        if result.status == "UP"
+    )
 
     if total_checks == 0:
         uptime = 0
     else:
-        uptime = (successful_checks / total_checks) * 100
+        uptime = (
+            successful_checks / total_checks
+        ) * 100
 
     return {
         "service_id": service.id,
@@ -196,17 +268,32 @@ def get_service_uptime(service_id: int, db: Session = Depends(get_db)):
     }
 
 
+# ================================
+# Current service status
+# ================================
+
 @app.get("/services/{service_id}/status")
-def get_service_status(service_id: int, db: Session = Depends(get_db)):
-    service = db.query(Service).filter(Service.id == service_id).first()
+def get_service_status(
+    service_id: int,
+    db: Session = Depends(get_db)
+):
+    service = (
+        db.query(Service)
+        .filter(Service.id == service_id)
+        .first()
+    )
 
     if service is None:
         return {"error": "Service not found"}
 
     latest_result = (
         db.query(MonitoringResult)
-        .filter(MonitoringResult.service_id == service_id)
-        .order_by(MonitoringResult.checked_at.desc())
+        .filter(
+            MonitoringResult.service_id == service_id
+        )
+        .order_by(
+            MonitoringResult.checked_at.desc()
+        )
         .first()
     )
 
@@ -228,8 +315,12 @@ def get_service_status(service_id: int, db: Session = Depends(get_db)):
         "checked_at": latest_result.checked_at,
         "failure_reason": latest_result.failure_reason,
     }
-    
-    
+
+
+# ================================
+# Alerts
+# ================================
+
 @app.get("/alerts")
 def get_alerts(db: Session = Depends(get_db)):
     alerts = (
@@ -248,3 +339,22 @@ def get_alerts(db: Session = Depends(get_db)):
         }
         for alert in alerts
     ]
+
+
+# ================================
+# Clear all monitoring data
+# ================================
+
+@app.delete("/data")
+def clear_all_data(db: Session = Depends(get_db)):
+
+    db.query(Alert).delete()
+    db.query(Incident).delete()
+    db.query(MonitoringResult).delete()
+    db.query(Service).delete()
+
+    db.commit()
+
+    return {
+        "message": "All services, monitoring history, incidents, and alerts have been cleared."
+    }
