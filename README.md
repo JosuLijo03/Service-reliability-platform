@@ -2,9 +2,19 @@
 
 A lightweight service monitoring platform that continuously checks APIs and services for availability, response latency, failures, incidents, and recovery.
 
-The platform provides a FastAPI backend, automated monitoring, incident lifecycle management, alert generation, historical monitoring data, and a web-based dashboard.
+The platform provides a FastAPI backend, automated monitoring, incident lifecycle management, alert generation, historical monitoring data, and a React-based web dashboard.
 
 ---
+
+## Tech Stack
+
+- **Frontend:** React
+- **Backend:** Python, FastAPI
+- **Database:** PostgreSQL
+- **ORM:** SQLAlchemy
+- **HTTP Monitoring:** HTTPX
+- **Testing:** pytest
+- **Deployment:** Docker
 
 ## Overview
 
@@ -32,7 +42,7 @@ When the service recovers, the system:
 - Records the incident duration
 - Generates a RECOVERED alert
 
-The project also provides a web dashboard for viewing service health, incidents, alerts, and reliability information.
+The project also provides a React-based web dashboard for viewing service health, incidents, alerts, and reliability information.
 
 ---
 
@@ -47,26 +57,26 @@ The project also provides a web dashboard for viewing service health, incidents,
 ```text
                     ┌─────────────────────────┐
                     │       Web Browser       │
-                    │   HTML / CSS / JavaScript│
+                    │      React Dashboard    │
                     └────────────┬────────────┘
                                  │
                                  ▼
                     ┌─────────────────────────┐
-                    │       FastAPI API        │
+                    │       FastAPI API       │
                     └────────────┬────────────┘
                                  │
               ┌──────────────────┼──────────────────┐
               │                  │                  │
               ▼                  ▼                  ▼
-      ┌───────────────┐  ┌───────────────┐  ┌───────────────┐
-      │   Monitoring  │  │    SQLite     │  │   REST API    │
-      │     Engine    │  │   Database    │  │   Endpoints   │
-      └───────┬───────┘  └───────────────┘  └───────────────┘
-              │
-              ▼
-         ┌─────────┐
-         │  HTTPX  │
-         └────┬────┘
-              │
-              ▼
-      External Services
+       ┌───────────────┐  ┌───────────────┐  ┌───────────────┐
+       │   Monitoring  │  │  PostgreSQL   │  │   REST API    │
+       │     Engine    │  │    Database   │  │   Endpoints   │
+       └───────┬───────┘  └───────────────┘  └───────────────┘
+               │
+               ▼
+          ┌─────────┐
+          │  HTTPX  │
+          └────┬────┘
+               │
+               ▼
+        External Services
