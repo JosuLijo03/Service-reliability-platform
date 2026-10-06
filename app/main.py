@@ -53,9 +53,9 @@ def health_check():
     return {"status": "healthy"}
 
 
-# ================================
+
 # Services
-# ================================
+
 
 @app.post("/services", response_model=ServiceResponse)
 def create_service(
@@ -105,9 +105,9 @@ def update_service(
     return existing_service
 
 
-# ================================
+
 # Manual service check
-# ================================
+
 
 @app.get("/check/{service_id}")
 def check(
@@ -147,9 +147,9 @@ def check(
     }
 
 
-# ================================
+
 # Service history
-# ================================
+
 
 @app.get("/services/{service_id}/history")
 def get_service_history(
@@ -188,9 +188,9 @@ def get_service_history(
     }
 
 
-# ================================
+
 # Incidents
-# ================================
+
 
 @app.get("/incidents")
 def get_incidents(db: Session = Depends(get_db)):
@@ -220,9 +220,9 @@ def get_incidents(db: Session = Depends(get_db)):
     ]
 
 
-# ================================
+
 # Service uptime
-# ================================
+
 
 @app.get("/services/{service_id}/uptime")
 def get_service_uptime(
@@ -268,9 +268,9 @@ def get_service_uptime(
     }
 
 
-# ================================
+
 # Current service status
-# ================================
+
 
 @app.get("/services/{service_id}/status")
 def get_service_status(
@@ -317,9 +317,9 @@ def get_service_status(
     }
 
 
-# ================================
+
 # Alerts
-# ================================
+
 
 @app.get("/alerts")
 def get_alerts(db: Session = Depends(get_db)):
@@ -341,9 +341,9 @@ def get_alerts(db: Session = Depends(get_db)):
     ]
 
 
-# ================================
+
 # Clear all monitoring data
-# ================================
+
 
 @app.delete("/data")
 def clear_all_data(db: Session = Depends(get_db)):

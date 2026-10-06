@@ -46,9 +46,9 @@ body {
 }
 
 
-/* =========================
+/* 
    HEADER
-   ========================= */
+    */
 
 header {
     padding: 28px 45px;
@@ -83,9 +83,9 @@ header {
     margin: 6px 0 0;
     font-size: 1rem;
 }
-/* =========================
+/* 
    BIN BUTTON
-   ========================= */
+    */
 
 .clear-data-button {
     width: 42px;
@@ -122,9 +122,9 @@ header {
 }
 
 
-/* =========================
+/*
    MAIN CONTENT
-   ========================= */
+  */
 
 main {
     width: 94%;
@@ -134,9 +134,9 @@ main {
 }
 
 
-/* =========================
+/* 
    SUMMARY CARDS
-   ========================= */
+    */
 
 .summary {
     display: grid;
@@ -175,9 +175,9 @@ main {
 }
 
 
-/* =========================
+/* 
    PANELS
-   ========================= */
+    */
 
 .panel {
     background: #111c2e;
@@ -195,9 +195,9 @@ main {
 }
 
 
-/* =========================
+/*
    ADD SERVICE
-   ========================= */
+   */
 
 #add-service-form {
     display: grid;
@@ -316,9 +316,9 @@ main {
 }
 
 
-/* =========================
+/* 
    TABLE
-   ========================= */
+    */
 
 table {
     width: 100%;
@@ -354,9 +354,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    STATUS
-   ========================= */
+    */
 
 .status-up {
     color: #22c55e;
@@ -379,9 +379,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    WARNING MODAL
-   ========================= */
+    */
 
 .warning-modal {
     position: fixed;
@@ -403,9 +403,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    WARNING DIALOG
-   ========================= */
+    */
 
 .warning-box {
     width: 100%;
@@ -445,9 +445,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    RED WARNING TRIANGLE
-   ========================= */
+    */
 
 .warning-icon {
     width: 0;
@@ -479,9 +479,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    WARNING TEXT
-   ========================= */
+    */
 
 .warning-box h2 {
     color: #ffffff;
@@ -510,9 +510,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    WARNING BUTTONS
-   ========================= */
+    */
 
 .warning-actions {
     display: flex;
@@ -576,9 +576,9 @@ tbody tr:hover {
 }
 
 
-/* =========================
+/* 
    RESPONSIVE
-   ========================= */
+    */
 
 @media (max-width: 1000px) {
 
