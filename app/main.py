@@ -1,7 +1,6 @@
 import asyncio
 
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
 
@@ -22,11 +21,7 @@ app = FastAPI(
 )
 
 
-app.mount(
-    "/static",
-    StaticFiles(directory="app/static"),
-    name="static"
-)
+
 
 
 @app.on_event("startup")
@@ -45,8 +40,9 @@ def get_db():
 
 @app.get("/")
 def root():
-    return FileResponse("app/static/index.html")
-
+    return {
+        "message": "Service Reliability Platform API is running"
+    }
 
 @app.get("/health")
 def health_check():

@@ -1,4 +1,6 @@
+
 import asyncio
+import time
 from datetime import datetime
 
 from .database import SessionLocal
@@ -7,78 +9,111 @@ from .monitor import check_service
 
 
 async def monitoring_loop():
+    next_check_times = {}
+    configured_intervals = {}
+
     while True:
         db = SessionLocal()
 
         try:
             services = db.query(Service).all()
+            current_service_ids = {service.id for service in services}
+
+            # Remove scheduling information for deleted services.
+            for service_id in list(next_check_times):
+                if service_id not in current_service_ids:
+                    next_check_times.pop(service_id, None)
+                    configured_intervals.pop(service_id, None)
+
+            now = time.monotonic()
+            due_services = []
 
             for service in services:
-                result = check_service(service.url)
+                interval = max(1, int(service.check_interval or 30))
 
-                # Save every monitoring check
+                # New services are checked immediately.
+                # Interval changes are picked up from the database.
+                if (
+                    service.id not in next_check_times
+                    or configured_intervals.get(service.id) != interval
+                ):
+                    configured_intervals[service.id] = interval
+                    next_check_times[service.id] = now
+
+                if now >= next_check_times[service.id]:
+                    due_services.append(
+                        (service.id, service.name, service.url, interval)
+                    )
+
+                    # Schedule the next check using this service's interval.
+                    next_check_times[service.id] = now + interval
+
+            # Perform due network checks without blocking the event loop.
+            results = await asyncio.gather(
+                *(
+                    asyncio.to_thread(check_service, url)
+                    for _, _, url, _ in due_services
+                )
+            )
+
+            for (service_id, service_name, url, interval), result in zip(
+                due_services, results
+            ):
                 monitoring_result = MonitoringResult(
-                    service_id=service.id,
+                    service_id=service_id,
                     status=result["status"],
                     status_code=result["status_code"],
                     response_time=result["response_time"],
-                    failure_reason=result["failure_reason"]
+                    failure_reason=result["failure_reason"],
                 )
-
                 db.add(monitoring_result)
 
-                # Find an existing open incident
                 open_incident = (
                     db.query(Incident)
                     .filter(
-                        Incident.service_id == service.id,
-                        Incident.status == "OPEN"
+                        Incident.service_id == service_id,
+                        Incident.status == "OPEN",
                     )
                     .first()
                 )
 
-                # Service is DOWN
                 if result["status"] == "DOWN":
-
-                    # Create an incident only if one isn't already open
                     if open_incident is None:
-                        incident = Incident(
-                            service_id=service.id,
-                            status="OPEN"
+                        db.add(
+                            Incident(
+                                service_id=service_id,
+                                status="OPEN",
+                            )
+                        )
+                        db.add(
+                            Alert(
+                                service_id=service_id,
+                                type="DOWN",
+                                message=f"{service_name} is DOWN",
+                            )
                         )
 
-                        db.add(incident)
-                        
-                        alert = Alert(
-                            service_id=service.id,
-                            type="DOWN",
-                            message=f"{service.name} is DOWN"
-                                     )
-
-                        db.add(alert)
-
-                # Service is UP
                 elif result["status"] == "UP":
-
-                    # Resolve the existing incident
                     if open_incident is not None:
-                        
-
                         open_incident.status = "RESOLVED"
                         open_incident.resolved_at = datetime.utcnow()
-                        
-                        
-                        alert = Alert(
-                                      service_id=service.id,
-                                      type="RECOVERED",
-                                      message=f"{service.name} has recovered"
-                                     )
 
-                        db.add(alert)
+                        db.add(
+                            Alert(
+                                service_id=service_id,
+                                type="RECOVERED",
+                                message=f"{service_name} has recovered",
+                            )
+                        )
 
             db.commit()
+
+        except Exception:
+            db.rollback()
+            raise
 
         finally:
             db.close()
 
-        await asyncio.sleep(30)
+        # Recheck the database frequently so interval edits are detected.
+        await asyncio.sleep(1)

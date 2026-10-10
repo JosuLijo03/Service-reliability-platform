@@ -35,8 +35,7 @@ function AddService({ onServiceAdded }) {
       setMessage(`Service "${result.name}" added successfully.`);
       setName("");
       setUrl("");
-      setCheckInterval(30);
-
+      
       if (onServiceAdded) {
         onServiceAdded();
       }
